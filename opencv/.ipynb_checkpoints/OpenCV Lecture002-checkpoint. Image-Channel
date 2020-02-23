@@ -1,0 +1,279 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "<img src='./img/intel-logo.jpg' width=10%> \n",
+    "    \n",
+    "<font size=7><div align='left'>OpenCV 기초강좌<br>\n",
+    "<br>\n",
+    "<font size=6><div align='left'>02. 이미지 채널<br>\n",
+    "<img src='./img/OpenCV_Logo_with_text.png' width=20%, Fig2> \n",
+    "    \n",
+    "<font size=3><div align='right'>\n",
+    "<div align='right'>성  민  석 (Minsuk  Sung)</div>\n",
+    "<div align='right'>류  회  성 (Hoesung Ryu)</div>\n",
+    "<div align='right'>이  인  구 (Ike Lee)</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "toc": true
+   },
+   "source": [
+    "<h1>Table of Contents<span class=\"tocSkip\"></span></h1>\n",
+    "<div class=\"toc\"><ul class=\"toc-item\"><li><span><a href=\"#들어가기-앞서\" data-toc-modified-id=\"들어가기-앞서-1\"><span class=\"toc-item-num\">1&nbsp;&nbsp;</span>들어가기 앞서</a></span></li><li><span><a href=\"#Color-space-변환\" data-toc-modified-id=\"Color-space-변환-2\"><span class=\"toc-item-num\">2&nbsp;&nbsp;</span>Color-space 변환</a></span><ul class=\"toc-item\"><li><span><a href=\"#BGR--->-Grayscale\" data-toc-modified-id=\"BGR--->-Grayscale-2.1\"><span class=\"toc-item-num\">2.1&nbsp;&nbsp;</span>BGR --&gt; Grayscale</a></span></li><li><span><a href=\"#BGR->HSV로-변환\" data-toc-modified-id=\"BGR->HSV로-변환-2.2\"><span class=\"toc-item-num\">2.2&nbsp;&nbsp;</span>BGR-&gt;HSV로 변환</a></span></li><li><span><a href=\"#수동으로-채널을-B,G,R-로-분리-한-후-다시-RGB로-합치기\" data-toc-modified-id=\"수동으로-채널을-B,G,R-로-분리-한-후-다시-RGB로-합치기-2.3\"><span class=\"toc-item-num\">2.3&nbsp;&nbsp;</span>수동으로 채널을 B,G,R 로 분리 한 후 다시 RGB로 합치기</a></span></li><li><span><a href=\"#BGR->HSV로-변환\" data-toc-modified-id=\"BGR->HSV로-변환-2.4\"><span class=\"toc-item-num\">2.4&nbsp;&nbsp;</span>BGR-&gt;HSV로 변환</a></span></li></ul></li></ul></div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 들어가기 앞서 \n",
+    "\n",
+    "1. Grayscale Image \n",
+    " <img src='./img/grayscale.png' width=90%>\n",
+    " Pixel당 8bit, 즉 256단계의 명암(빛의 세기)을 표현할 수 있는 이미지입니다.\n",
+    "\n",
+    "\n",
+    "2. Color Image \n",
+    "\n",
+    " Color 이미지는 pixel의 색을 표현하기 위해서 pixel당 24bit를 사용합니다. 총 16,777,216 가지의 색을 표현할 수 있습니다. 이것을 일반적으로 True color image라고 합니다. pixel은 RGB 각각을 위해서 8bit를 사용하게 됩니다. OpenCV에서는 BGR로 표현을 하기 때문에 Blue->(255,0,0), Green->(0,255,0), Red->(0,0,255), White->(255,255,255), Black->(0,0,0)으로 표현할 수 있습니다.\n",
+    " \n",
+    " - RGB \n",
+    " <img src='./img/rgb_image.png' width=100%>\n",
+    " RGB 모델은 빛의 삼원색인 빨간색, 초록색, 파란색을 기본 색으로 사용을 합니다. 정육면체 모델 형태로 표현할 수 있습니다.<p>\n",
+    " \n",
+    " - HSV\n",
+    " <img src='./img/HSV.jpeg' width=80%>\n",
+    "     이미지 처리에서 가장 많이 사용되는 형태의 Color 모델입니다. 하나의 모델에서 색과 채도, 명도를 모두 알 수 있습니다. \n",
+    "     \n",
+    "    - H(ue) : 색상. 일반적인 색을 의미함. 원추모형에서 각도로 표현이 됨.(0: Red, 120도 : Green, 240: Blue)\n",
+    "     - S(aturation) : 채도. 색읜 순수성을 의미하며 일반적으로 짙다, 흐리다로 표현이 됨. 중심에서 바깥쪽으로 이동하면 채도가 높음.\n",
+    "     - V(alue) : 명도. 색의 밝고 어두운 정도. 수직축의 깊이로 표현. 어둡다 밝다로 표현이 됨."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Color-space 변환\n",
+    "\n",
+    "\n",
+    "`OpenCV` 에서는 이미지를 `BGR`로 읽으며, 150여가지 변환 방법이 있습니다. 그 중에 서 많이 사용되는 `BGR<->Gray`, `BGR<->RGB`, `BGR<->HSV` 에 대해서 알아 보겠습니다. 변환을 위해서 사용하는 함수는 `cv2.cvtColor()` 함수 입니다.\n",
+    "\n",
+    "```\n",
+    "cv2.cvtColor(src, code)\n",
+    "    Params src:\t image\n",
+    "    Params code:\t변환 코드\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### BGR --> Grayscale\n",
+    "\n",
+    "`cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:56:33.905197Z",
+     "start_time": "2019-12-05T06:56:33.888641Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "import matplotlib.pyplot as plt \n",
+    "import cv2\n",
+    "\n",
+    "\n",
+    "# 원본그대로 불러오기 \n",
+    "image = cv2.imread(\"./img/toy.jpg\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:56:34.693315Z",
+     "start_time": "2019-12-05T06:56:34.573024Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)\n",
+    "\n",
+    "\n",
+    "plt.title(\"gray_image\")\n",
+    "plt.imshow(gray,cmap='gray')\n",
+    "plt.xticks([]) # x축 눈금 없애기\n",
+    "plt.yticks([]) # y축 눈금 없애기 \n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### BGR->RGB로 변환\n",
+    " `cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)`\n",
+    "     "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:56:37.013259Z",
+     "start_time": "2019-12-05T06:56:36.829482Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)\n",
+    "\n",
+    "\n",
+    "plt.title(\"rgb_image\")\n",
+    "plt.imshow(rgb)\n",
+    "plt.xticks([]) # x축 눈금 없애기\n",
+    "plt.yticks([]) # y축 눈금 없애기 \n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:56:37.013259Z",
+     "start_time": "2019-12-05T06:56:36.829482Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# original image \n",
+    "image = cv2.imread(\"./img/toy.jpg\")\n",
+    "plt.title(\"bgr_image\")\n",
+    "plt.imshow(image)\n",
+    "plt.xticks([]) # x축 눈금 없애기\n",
+    "plt.yticks([]) # y축 눈금 없애기 \n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 수동으로 채널을 B,G,R 로 분리 한 후 다시 RGB로 합치기"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:56:38.859019Z",
+     "start_time": "2019-12-05T06:56:38.662343Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# B,G,R 로 분리 \n",
+    "b, g, r = cv2.split(image)\n",
+    "# RGB 로 다시 합치기 \n",
+    "manual_image =cv2.merge([r,g,b])\n",
+    "\n",
+    "plt.title(\"rgb_image\")\n",
+    "plt.imshow(manual_image)\n",
+    "plt.xticks([]) # x축 눈금 없애기\n",
+    "plt.yticks([]) # y축 눈금 없애기 \n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### BGR->HSV로 변환\n",
+    "     \n",
+    " `cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)`\n",
+    "     "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:13:28.872101Z",
+     "start_time": "2019-12-05T06:13:28.686765Z"
+    },
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)\n",
+    "\n",
+    "\n",
+    "plt.title(\"HSV_image\")\n",
+    "plt.imshow(hsv)\n",
+    "plt.xticks([]) # x축 눈금 없애기\n",
+    "plt.yticks([]) # y축 눈금 없애기 \n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.2"
+  },
+  "toc": {
+   "base_numbering": 1,
+   "nav_menu": {},
+   "number_sections": true,
+   "sideBar": true,
+   "skip_h1_title": true,
+   "title_cell": "Table of Contents",
+   "title_sidebar": "Contents",
+   "toc_cell": true,
+   "toc_position": {},
+   "toc_section_display": true,
+   "toc_window_display": true
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

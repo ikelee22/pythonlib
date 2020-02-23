@@ -1,0 +1,354 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<img src='./img/intel-logo.jpg' width=10%> \n",
+    "    \n",
+    "<font size=7><div align='left'>OpenCV 기초강좌<br>\n",
+    "<br>\n",
+    "<font size=6><div align='left'>04.Pyramids<br>\n",
+    "<img src='./img/OpenCV_Logo_with_text.png' width=20%, Fig2> \n",
+    "    \n",
+    "<font size=3><div align='right'>\n",
+    "<div align='right'>성  민  석 (Minsuk  Sung)</div>\n",
+    "<div align='right'>류  회  성 (Hoesung Ryu)</div>\n",
+    "<div align='right'>이  인  구 (Ike Lee)</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "toc": true
+   },
+   "source": [
+    "<h1>Table of Contents<span class=\"tocSkip\"></span></h1>\n",
+    "<div class=\"toc\"><ul class=\"toc-item\"><li><span><a href=\"#들어가기-앞서\" data-toc-modified-id=\"들어가기-앞서-1\"><span class=\"toc-item-num\">1&nbsp;&nbsp;</span>들어가기 앞서</a></span></li><li><span><a href=\"#Gaussian-Pyramid\" data-toc-modified-id=\"Gaussian-Pyramid-2\"><span class=\"toc-item-num\">2&nbsp;&nbsp;</span>Gaussian Pyramid</a></span></li><li><span><a href=\"#Laplacian-Pyramid\" data-toc-modified-id=\"Laplacian-Pyramid-3\"><span class=\"toc-item-num\">3&nbsp;&nbsp;</span>Laplacian Pyramid</a></span><ul class=\"toc-item\"><li><span><a href=\"#Laplacian-Pyramid가-필요한-이유\" data-toc-modified-id=\"Laplacian-Pyramid가-필요한-이유-3.1\"><span class=\"toc-item-num\">3.1&nbsp;&nbsp;</span>Laplacian Pyramid가 필요한 이유</a></span></li><li><span><a href=\"#Laplacian-Pyramid를-이용하여-합치기\" data-toc-modified-id=\"Laplacian-Pyramid를-이용하여-합치기-3.2\"><span class=\"toc-item-num\">3.2&nbsp;&nbsp;</span>Laplacian Pyramid를 이용하여 합치기</a></span></li></ul></li></ul></div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 들어가기 앞서 \n",
+    "\n",
+    "1. Image Pyramid 정의 \n",
+    "\n",
+    " 동일 이미지의 서로 다른 사이즈의 set을 Image Pyramids라고 합니다. 아래 그림과 같이 가장 아래에 가장 큰 해상도가 놓여지며, 점점 줄여가면서 쌓아가는 형태입니다.\n",
+    " <img src='./img/pyramid.png' width=80%, Fig2> \n",
+    " \n",
+    "2. Image Pyramid 종류 \n",
+    " 1. Gaussian Pyramids \n",
+    " 2. Laplacian Pyramids\n",
+    " >라플라시안 피라미드의 기본적인 원리는 이미지를 확장했을때 원본과의 차이를 저장해놓는 것이다.\n",
+    "예를들어 위의 그림 라플라스 피라미드의 제일 아래의 이미지를 가로세로 각각 2배로 확장을 하더라도 가우시안 피라미드의 2번째 그림과 같은 깔끔한 결과를 '바로' 얻을 수는 없다.(일반적으로 이미지 리사이즈를 해서 크기를 키웠을때 결과가 깔끔하지 않은것을 생각해보면 된다)\n",
+    "하지만 라플라스 피라미드 2번째에 저장되어있는 차이를 이용해서 보정을 하면 똑같은 깔끔한 결과를 얻을 수 있고, 이것을 반복하면 가우시안 피라미드 제일 위쪽에 있는것과 같은 깔끔한 원본그림을 얻을 수 있는것이다. <br>\n",
+    "\n",
+    "<img src='./img/가우시안과 라플라시안 피라미드.png' width =60%>\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:59:05.596471Z",
+     "start_time": "2019-12-05T06:59:05.582295Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "import matplotlib.pyplot as plt \n",
+    "import cv2\n",
+    "\n",
+    "# 원본 \n",
+    "image = cv2.imread(\"./img/lenna.png\")\n",
+    "rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Gaussian Pyramid \n",
+    "\n",
+    "Gaussian Pyramid의 High Level(낮은 해상도. Pyramid의 상단)은 Lower level에서 row와 column을 연속적으로 제거하면서 생성됩니다. M x N 사이즈의 이미지는 M/2 X N/2 가 적용되면 전체 크기는 1/4사이즈로 줄어들게 됩니다."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:59:15.704950Z",
+     "start_time": "2019-12-05T06:59:14.989108Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# pyrDown(img) # 원본 이미지의 1/4 사이즈\n",
+    "lower_reso = cv2.pyrDown(rgb) \n",
+    "\n",
+    "# 원본 이미지의 4배 사이즈\n",
+    "higher_reso = cv2.pyrUp(rgb) \n",
+    "\n",
+    "\n",
+    "plt.title(\"Original\")\n",
+    "plt.imshow(rgb)\n",
+    "plt.show()\n",
+    "\n",
+    "\n",
+    "plt.title(\"higher\")\n",
+    "plt.imshow(higher_reso)\n",
+    "plt.show()\n",
+    "\n",
+    "plt.title(\"lower\")\n",
+    "plt.imshow(lower_reso)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Laplacian Pyramid\n",
+    "### Laplacian Pyramid가 필요한 이유\n",
+    "Laplacian Pyramid는 Gaussian Pyramid에서 만들어 집니다. \n",
+    "\n",
+    "\n",
+    "`cv2.pyrDown()`과 `cv2.pyrUp()` 함수를 사용하여 축소한 다음 확장을 하면 원본과 동일한 이미지를 얻을 수 없습니다.\n",
+    " <img src='./img/downup.png' width=80%, Fig2> \n",
+    "\n",
+    "원본 이미지의 shape가 (225,400,3)을 `cv2.pyrDown()` 을 적용하면 행과 열이 2배씩 줄게 되고 소수점은 반올림이 되어 `(113,200,3)`이 됩니다. 이것을 다시 `cv2.pyrUp()`을 시키면 (226,400,3) 이 되어 원본 이미지와 1row 차이가 발생합니다."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T07:17:32.658827Z",
+     "start_time": "2019-12-05T07:17:32.653447Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# resize 255*400\n",
+    "ex_img = cv2.resize(rgb, (400, 225))\n",
+    "ex_img.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T07:20:29.146552Z",
+     "start_time": "2019-12-05T07:20:29.142971Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "GAD = cv2.pyrDown(ex_img)\n",
+    "print('Downsamping shape:',GAD.shape)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T07:20:41.200311Z",
+     "start_time": "2019-12-05T07:20:41.196685Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "GAU = cv2.pyrUp(GAD)\n",
+    "print('Upsamping shape:',GAU.shape)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T07:19:42.086591Z",
+     "start_time": "2019-12-05T07:19:41.313901Z"
+    },
+    "scrolled": false
+   },
+   "outputs": [],
+   "source": [
+    "# resize \n",
+    "temp = cv2.resize(GAU, (400, 225))\n",
+    "res = cv2.subtract(ex_img, temp)\n",
+    "\n",
+    "\n",
+    "plt.title(\"ex_img\")\n",
+    "plt.imshow(ex_img)\n",
+    "plt.show()\n",
+    "\n",
+    "plt.title(\"temp\")\n",
+    "plt.imshow(temp)\n",
+    "plt.show()\n",
+    "\n",
+    "plt.title(\"res\")\n",
+    "plt.imshow(res)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Laplacian Pyramid를 이용하여 합치기\n",
+    "\n",
+    "실행순서\n",
+    "1. 2개의 이미지를 각각 Load함.\n",
+    "2. 각 이미지에 대해서 적당한 Gaussian Pyramid를 생성함.\n",
+    "3. Gaussian Pyramid를 이용하여 Laplacian Pyramid를 생성함.\n",
+    "4. 각 단계의 Laplicain Pyramid를 이용하여 각 이미지의 좌측과 우측을 결함.\n",
+    "5. 결함한 결과중 가장 작은 이미지를 확대하면서 동일 사이즈의 결합결과와 Add하여 외곽선을 선명하게 처리함"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T07:29:15.488203Z",
+     "start_time": "2019-12-05T07:29:15.244356Z"
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<Figure size 640x480 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "import cv2\n",
+    "import numpy as np\n",
+    "from matplotlib import pyplot as plt\n",
+    "# 1단계\n",
+    "\n",
+    "image = cv2.imread(\"./img/lenna.png\")\n",
+    "rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)\n",
+    "\n",
+    "A = rgb.copy()\n",
+    "B = rgb.copy()\n",
+    "# 2단계\n",
+    "# A 이미지에 대한 Gaussian Pyramid를 생성\n",
+    "# 점점 작아지는 Pyramid\n",
+    "G = A.copy()\n",
+    "gpA = [G]\n",
+    "for i in range(6):\n",
+    "    G = cv2.pyrDown(G)\n",
+    "    gpA.append(G)\n",
+    "\n",
+    "# B 이미지에 대한 Gaussian Pyramid 생성\n",
+    "# 점점 작아지는 Pyramid\n",
+    "G = B.copy()\n",
+    "gpB = [G]\n",
+    "for i in range(6):\n",
+    "    G = cv2.pyrDown(G)\n",
+    "    gpB.append(G)\n",
+    "\n",
+    "# 3단계\n",
+    "# A 이미지에 대한 Laplacian Pyramid 생성\n",
+    "lpA = [gpA[5]] # n번째 추가된 Gaussian Image\n",
+    "for i in range(5,0,-1):\n",
+    "    GE = cv2.pyrUp(gpA[i]) #n번째 추가된 Gaussian Image를 Up Scale함.\n",
+    "    temp = cv2.resize(gpA[i-1], (GE.shape[:2][1], GE.shape[:2][0])) # 행렬의 크기를 동일하게 만듬.\n",
+    "    L = cv2.subtract(temp,GE) # n-1번째 이미지에서 n번째 Up Sacle한 이미지 차이 -> Laplacian Pyramid\n",
+    "    lpA.append(L)\n",
+    "\n",
+    "# A 이미지와 동일하게 B 이미지도 Laplacian Pyramid 생성\n",
+    "lpB = [gpB[5]]\n",
+    "for i in range(5,0,-1):\n",
+    "    GE = cv2.pyrUp(gpB[i])\n",
+    "    temp = cv2.resize(gpB[i - 1], (GE.shape[:2][1], GE.shape[:2][0]))\n",
+    "    L = cv2.subtract(temp, GE)\n",
+    "    # L = cv2.subtract(gpB[i-1],GE)\n",
+    "    lpB.append(L)\n",
+    "\n",
+    "# 4단계\n",
+    "# Laplician Pyramid를 누적으로 좌측과 우측으로 재결함\n",
+    "LS = []\n",
+    "for la,lb in zip(lpA,lpB):\n",
+    "    rows,cols,dpt = la.shape\n",
+    "    ls = np.hstack((la[:,0:int(cols/2)], lb[:,int(cols/2):]))\n",
+    "    LS.append(ls)\n",
+    "\n",
+    "\n",
+    "# 5단계\n",
+    "ls_ = LS[0] # 좌측과 우측이 결합된 가장 작은 이미지\n",
+    "for i in range(1,6):\n",
+    "    ls_ = cv2.pyrUp(ls_) # Up Sacle\n",
+    "    temp = cv2.resize(LS[i],(ls_.shape[:2][1], ls_.shape[:2][0])) # 외곽선만 있는 이미지\n",
+    "    ls_ = cv2.add(ls_, temp) # UP Sacle된 이미지에 외곽선을 추가하여 선명한 이미지로 생성\n",
+    "\n",
+    "# 원본 이미지를 그대로 붙인 경우\n",
+    "real = np.hstack((A[:,:int(cols/2)],B[:,int(cols/2):]))\n",
+    "\n",
+    "\n",
+    "plt.title(\"Laplacian Pyramid: Down -> Up\")\n",
+    "plt.imshow(real)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "참조 : \n",
+    "    \n",
+    "-.https://yoonho.info/10 "
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.2"
+  },
+  "toc": {
+   "base_numbering": 1,
+   "nav_menu": {},
+   "number_sections": true,
+   "sideBar": true,
+   "skip_h1_title": true,
+   "title_cell": "Table of Contents",
+   "title_sidebar": "Contents",
+   "toc_cell": true,
+   "toc_position": {},
+   "toc_section_display": true,
+   "toc_window_display": true
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

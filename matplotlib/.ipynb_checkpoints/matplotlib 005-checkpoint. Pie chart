@@ -1,0 +1,245 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<img src='./img/intel-logo.jpg' width=10%> \n",
+    "    \n",
+    "<font size=7><div align='left'>Matplotlib Introduction<br>\n",
+    "<br>\n",
+    "<font size=6><div align='left'>05. 파이차트<br>\n",
+    "<img src='./img/matplotlib_logo.png' width=30%, Fig2> \n",
+    "    \n",
+    "<font size=3><div align='right'>\n",
+    "<div align='right'>성  민  석 (Minsuk  Sung)</div>\n",
+    "<div align='right'>류  회  성 (Hoesung Ryu)</div>\n",
+    "<div align='right'>이  인  구 (Ike Lee)</div>\n",
+    "    \n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "toc": true
+   },
+   "source": [
+    "<h1>Table of Contents<span class=\"tocSkip\"></span></h1>\n",
+    "<div class=\"toc\"><ul class=\"toc-item\"><li><span><a href=\"#간단한-파이차트그리기\" data-toc-modified-id=\"간단한-파이차트그리기-1\"><span class=\"toc-item-num\">1&nbsp;&nbsp;</span>간단한 파이차트그리기</a></span></li><li><span><a href=\"#파이차트-스타일\" data-toc-modified-id=\"파이차트-스타일-2\"><span class=\"toc-item-num\">2&nbsp;&nbsp;</span>파이차트 스타일</a></span></li><li><span><a href=\"#파이차트-퍼센트와-같이-표시하기\" data-toc-modified-id=\"파이차트-퍼센트와-같이-표시하기-3\"><span class=\"toc-item-num\">3&nbsp;&nbsp;</span>파이차트 퍼센트와 같이 표시하기</a></span></li><li><span><a href=\"#파이차트-Explode\" data-toc-modified-id=\"파이차트-Explode-4\"><span class=\"toc-item-num\">4&nbsp;&nbsp;</span>파이차트 Explode</a></span></li></ul></div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 간단한 파이차트그리기 \n",
+    "\n",
+    "pie 차트는 `matplotlib.pyplot` 모듈의 `pie 함수`를 사용해 그릴 수 있습니다.\n",
+    "\n",
+    "pie 함수의 첫 번째 인자는 각 범주가 데이터에서 차지하는 비율을 뜻하며, labels를 통해 범주를 전달할 수 있습니다. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-26T06:52:42.202055Z",
+     "start_time": "2019-12-26T06:52:42.198334Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-26T06:57:17.632755Z",
+     "start_time": "2019-12-26T06:57:17.530321Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "exp_vals = [1400,600,300,410,250]\n",
+    "exp_labels = [\"Home Rent\",\"Food\",\"Phone/Internet Bill\",\"Car \",\"Other Utilities\"]\n",
+    "plt.pie(exp_vals,labels=exp_labels)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 파이차트 스타일 \n",
+    "\n",
+    "- ` axis('equal)` 를 통해 완벽한 원형으로 파이차트를 표시 할 수 있습니다. \n",
+    "- `shadow=True` 를 통해 pie 차트에 그림자를 설정할 수 있습니다.\n",
+    "- `startangle=` 를 통해 시작각도를 설정 할 수 있습니다."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-26T07:03:46.861057Z",
+     "start_time": "2019-12-26T07:03:46.754362Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "plt.pie(exp_vals,labels=exp_labels, shadow=True)\n",
+    "plt.axis(\"equal\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-26T07:03:47.322265Z",
+     "start_time": "2019-12-26T07:03:47.219604Z"
+    },
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "plt.pie(exp_vals,labels=exp_labels, shadow=True,startangle=90)\n",
+    "plt.axis(\"equal\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 파이차트 퍼센트와 같이 표시하기 \n",
+    "\n",
+    "`autopct` 명령어를 통하여 퍼센트를 표시 할수 있으며, 소수점 자리수도 설정 할 수 있습니다."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-26T07:00:35.624405Z",
+     "start_time": "2019-12-26T07:00:35.508654Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "plt.pie(exp_vals,\n",
+    "        labels=exp_labels,\n",
+    "        shadow=True,\n",
+    "        autopct='%1.1f%%', # 퍼센트 표시하기\n",
+    "        radius=1.5)\n",
+    "plt.axis(\"equal\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 파이차트 Explode\n",
+    "\n",
+    "`explode` 명령어로 파이조각이 돌출되는 크기를 설정 할 수있으며, 0이면 돌출되지 않습니다. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-26T07:04:44.360295Z",
+     "start_time": "2019-12-26T07:04:44.234940Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# 이 그라프에서는 파란색을 시작으로 왼쪽 방향으로 가는게 순서입니다. \n",
+    "plt.axis(\"equal\")\n",
+    "plt.pie(exp_vals,\n",
+    "        labels=exp_labels,\n",
+    "        shadow=True,\n",
+    "        autopct='%1.1f%%',\n",
+    "        radius=1.5,\n",
+    "        explode=[0,0,0,0.1,0.2],\n",
+    "        startangle=0)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "from matplotlib import font_manager, rc\n",
+    "from matplotlib import style\n",
+    "\n",
+    "# font_name = font_manager.FontProperties(fname=\"c:/Windows/Fonts/malgun.ttf\").get_name()\n",
+    "# rc('font', family=font_name)\n",
+    "style.use('ggplot')\n",
+    "\n",
+    "colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue', 'red']\n",
+    "labels = ['samsung전자', 'SK하이닉스', 'LG전자', 'Naver네이버', 'Kakao카카오']\n",
+    "ratio = [50, 20, 10, 10, 10]\n",
+    "explode = (0.0, 0.1, 0.0, 0.0, 0.0)\n",
+    "\n",
+    "plt.pie(ratio, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=90)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.2"
+  },
+  "toc": {
+   "base_numbering": 1,
+   "nav_menu": {},
+   "number_sections": true,
+   "sideBar": true,
+   "skip_h1_title": true,
+   "title_cell": "Table of Contents",
+   "title_sidebar": "Contents",
+   "toc_cell": true,
+   "toc_position": {},
+   "toc_section_display": true,
+   "toc_window_display": false
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

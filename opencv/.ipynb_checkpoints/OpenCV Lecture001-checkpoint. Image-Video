@@ -1,0 +1,371 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<img src='./img/intel-logo.jpg' width=10%> \n",
+    "    \n",
+    "<font size=7><div align='left'>OpenCV 기초강좌<br>\n",
+    "<br>\n",
+    "<font size=6><div align='left'>01. 이미지, 비디오 입출력<br>\n",
+    "<img src='./img/OpenCV_Logo_with_text.png' width=20%, Fig2> \n",
+    "    \n",
+    "<font size=3><div align='right'>\n",
+    "<div align='right'>성  민  석 (Minsuk  Sung)</div>\n",
+    "<div align='right'>류  회  성 (Hoesung Ryu)</div>\n",
+    "<div align='right'>이  인  구 (Ike Lee)</div>\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "toc": true
+   },
+   "source": [
+    "<h1>Table of Contents<span class=\"tocSkip\"></span></h1>\n",
+    "<div class=\"toc\"><ul class=\"toc-item\"><li><span><a href=\"#이미지-읽기\" data-toc-modified-id=\"이미지-읽기-1\"><span class=\"toc-item-num\">1&nbsp;&nbsp;</span>이미지 읽기</a></span></li><li><span><a href=\"#Matplotlib을-이용해-이미지-시각화-하기\" data-toc-modified-id=\"Matplotlib을-이용해-이미지-시각화-하기-2\"><span class=\"toc-item-num\">2&nbsp;&nbsp;</span>Matplotlib을 이용해 이미지 시각화 하기</a></span></li><li><span><a href=\"#이미지-저장하기\" data-toc-modified-id=\"이미지-저장하기-3\"><span class=\"toc-item-num\">3&nbsp;&nbsp;</span>이미지 저장하기</a></span></li><li><span><a href=\"#웹캠을-사용하여-비디오-읽기\" data-toc-modified-id=\"웹캠을-사용하여-비디오-읽기-4\"><span class=\"toc-item-num\">4&nbsp;&nbsp;</span>웹캠을 사용하여 비디오 읽기</a></span></li><li><span><a href=\"#영상-저장\" data-toc-modified-id=\"영상-저장-5\"><span class=\"toc-item-num\">5&nbsp;&nbsp;</span>영상 저장</a></span></li></ul></div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 이미지 읽기\n",
+    "\n",
+    "`cv2.imread(file, flag)`\n",
+    "\n",
+    "flag에 다양한 옵션을 주어 여러가지 형태로 불러 올 수 있습니다.\n",
+    "\n",
+    "1. file :  저장위치\n",
+    "\n",
+    "\n",
+    "2. flag\n",
+    " - cv2.IMREAD_ANYCOLOR: 원본 파일로 읽어옵니다. \n",
+    " - cv2.IMREAD_COLOR: 이미지 파일을 Color로 읽음. 투명한 부분은 무시하며 Default 설정입니다.\n",
+    " - cv2.IMREAD_GRAYSCALE: 이미지 파일을 Grayscale로 읽음. 실제 이미지 처리시 중간 단계로 많이 사용합니다\n",
+    " - cv2.IMREAD_UNCHAGED: 이미지 파일을 alpha channel 까지 포함해 읽음"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:00:00.788374Z",
+     "start_time": "2019-12-05T06:00:00.031051Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "import cv2\n",
+    "\n",
+    "# 원본그대로 불러오기 \n",
+    "image = cv2.imread(\"./img/toy.jpg\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:00:01.365472Z",
+     "start_time": "2019-12-05T06:00:01.357626Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# 회색조로 불러오기 \n",
+    "img_gray = cv2.imread(\"./img/toy.jpg\", cv2.IMREAD_GRAYSCALE)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Matplotlib을 이용해 이미지 시각화 하기 \n",
+    "\n",
+    "`jupyter notebook`에서 작업하는 경우 Matplotlib을 이용하여 시각화하는 방법을 추천합니다. \\\n",
+    "`%matplotlib inline`은 IPython 에서 제공하는 Rich output에 대한 표현 방식으로 도표와 같은 그림, 소리, 애니메니션과 같은 결과물들을 말합니다. \n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:00:07.172645Z",
+     "start_time": "2019-12-05T06:00:06.982080Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "%matplotlib inline    \n",
+    "import matplotlib.pyplot as plt \n",
+    "\n",
+    "plt.title(\"image\")\n",
+    "plt.imshow(image)\n",
+    "plt.xticks([]) # x축 눈금 없애기\n",
+    "plt.yticks([]) # y축 눈금 없애기 \n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:01:00.555137Z",
+     "start_time": "2019-12-05T06:01:00.398757Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "plt.title(\"image_gray\")\n",
+    "plt.imshow(img_gray,cmap='gray')\n",
+    "plt.xticks([]) # x축 눈금 없애기\n",
+    "plt.yticks([]) # y축 눈금 없애기 \n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 이미지 저장하기 "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T06:01:11.188967Z",
+     "start_time": "2019-12-05T06:01:11.151148Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "cv2.imwrite('./data/toy_image.jpg', image)\n",
+    "cv2.imwrite('./data/toy_gray_image.jpg', img_gray)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# 바르게 저장이 되었는지 확인 하기 위해 불러 봅니다. \n",
+    "image2 =  cv2.imread('./data/toy_image.jpg')\n",
+    "image22 =  cv2.imread('./data/toy_image.jpg', cv2.IMREAD_GRAYSCALE)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.title(\"image2\")\n",
+    "plt.imshow(image22, cmap='gray')\n",
+    "plt.xticks([]) # x축 눈금 없애기\n",
+    "plt.yticks([]) # y축 눈금 없애기 \n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "\n",
+    "## 웹캠을 사용하여 비디오 읽기 \n",
+    "\n",
+    "**`MAC_카탈리나` 환경에서는 창이 안닫히는 현상이 있으므로 실행하지 않는 것을 추천합니다.**  \n",
+    "\n",
+    "\n",
+    "- `cv2.VideoCapture()`: 캡쳐 객체를 생성 합니다. 소유하고 있는 웹캠의 갯수많큼 인덱스가 생기며 인덱스는 0부터 시작합니다. 예를들어, 웹캠을 하나만 가지고 있다면 0 을 입력합니다. `cv2.VideoCapture(0)`\n",
+    "\n",
+    "\n",
+    "- `ret, fram = cap.read()`: 비디오의 한 프레임씩 읽습니다. 제대로 프레임을 읽으면 ret값이 True, 실패하면 False가 나타납니다. fram에 읽은 프레임이 나옵니다\n",
+    "- `cv2.cvtColor()`: frame을 흑백으로 변환합니다\n",
+    "- `cap.release()`: 오픈한 캡쳐 객체를 해제합니다\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T05:09:52.107249Z",
+     "start_time": "2019-12-05T05:09:50.676587Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# 흑백과 칼라를 구분하기 위한 옵셥이 들어 있고, 옵션이 없이 간단히  \"cap = cv2.VideoCapture(0)\" 으로 카메라를 켤수 있습니다. \n",
+    "\n",
+    "import cv2\n",
+    "\n",
+    "OPTION = 'color' # gray: 흑백 # color: 칼라 \n",
+    "\n",
+    "\n",
+    "cap = cv2.VideoCapture(0)\n",
+    "\n",
+    "while True:\n",
+    "    ret, frame = cap.read()    \n",
+    "    if ret:\n",
+    "        if OPTION == 'gray':\n",
+    "            gray = cv2.cvtColor(frame,  cv2.COLOR_BGR2GRAY)    # 입력 받은 화면 Gray로 변환\n",
+    "            cv2.imshow('frame_gray', gray)    # Gray 화면 출력\n",
+    "            if cv2.waitKey(1) == ord('q'): # q 를 누를시 정지 \n",
+    "                break\n",
+    "            \n",
+    "        elif OPTION == 'color':\n",
+    "            cv2.imshow('frame_color', frame)    # 컬러 화면 출력\n",
+    "            if cv2.waitKey(1) == ord('q'):\n",
+    "                break\n",
+    "    else:\n",
+    "        print('error')\n",
+    "        \n",
+    "cap.release()\n",
+    "cv2.destroyAllWindows()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T05:09:52.107249Z",
+     "start_time": "2019-12-05T05:09:50.676587Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# 흑백과 칼라를 구분하기 위한 옵셥이 없이 간단히 하기와 같이 카메라를 켤수 있습니다. \n",
+    "\n",
+    "import cv2\n",
+    "\n",
+    "cap = cv2.VideoCapture(0)\n",
+    "\n",
+    "while True:\n",
+    "    ret, frame = cap.read()    \n",
+    "    cv2.imshow('frame_color', frame)    # 컬러 화면 출력\n",
+    "    if cv2.waitKey(1) == ord('q'):\n",
+    "           break\n",
+    "               \n",
+    "cap.release()\n",
+    "cv2.destroyAllWindows()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 영상 저장 \n",
+    "\n",
+    "영상을 저장하기 위해서는 `cv2.VideoWriter` Object를 생성해야 합니다.\n",
+    "\n",
+    "```\n",
+    "\n",
+    "cv2.VideoWriter(outputFile, fourcc, frame, size)\n",
+    "영상을 저장하기 위한 Object\n",
+    "\n",
+    "    Parameters:\t\n",
+    "    outputFile (str) – 저장될 파일명\n",
+    "    fourcc – Codec정보. cv2.VideoWriter_fourcc()\n",
+    "    frame (float) – 초당 저장될 frame\n",
+    "    size (list) – 저장될 사이즈(ex; 640, 480)\n",
+    "```\n",
+    "\n",
+    "- `cv2.VideoWriter(outputFile, fourcc, frame, size)` : fourcc는 코덱 정보, frame은 초당 저장될 프레임, size는 저장될 사이즈를 뜻합니다.\n",
+    "\n",
+    "- `cv2.VideoWriter_fourcc('D','I','V','X')` 이런식으로도 사용하곤 합니다 적용 가능한 코덱은 DIVX, XVID, MJPG, X264, WMV1, WMV2 등이 있습니다"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2019-12-05T05:13:22.398238Z",
+     "start_time": "2019-12-05T05:13:22.011660Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "import cv2\n",
+    "\n",
+    "cap = cv2.VideoCapture(0)\n",
+    "fourcc = cv2.VideoWriter_fourcc(*'DIVX')\n",
+    "out = cv2.VideoWriter('./data/output.avi',\n",
+    "                      fourcc,\n",
+    "                      25.0,\n",
+    "                      (640, 480))\n",
+    "\n",
+    "while (cap.isOpened()):\n",
+    "    ret, frame = cap.read()\n",
+    "\n",
+    "    if ret:\n",
+    "\n",
+    "        out.write(frame)\n",
+    "\n",
+    "        cv2.imshow('frame', frame)\n",
+    "\n",
+    "        if cv2.waitKey(1) & 0xFF == ord('q'):\n",
+    "            break\n",
+    "    else:\n",
+    "        break\n",
+    "\n",
+    "cap.release()\n",
+    "out.release()\n",
+    "cv2.destroyAllWindows()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.2"
+  },
+  "toc": {
+   "base_numbering": 1,
+   "nav_menu": {},
+   "number_sections": true,
+   "sideBar": true,
+   "skip_h1_title": true,
+   "title_cell": "Table of Contents",
+   "title_sidebar": "Contents",
+   "toc_cell": true,
+   "toc_position": {},
+   "toc_section_display": true,
+   "toc_window_display": true
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
